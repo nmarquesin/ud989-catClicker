@@ -1,0 +1,15 @@
+body {
+	display: flex;
+}
+
+#cat {
+	display: flex;
+	padding-left: 50px;
+}
+
+.hidden {
+	display: none;
+}
+
+.catMenu {
+}
