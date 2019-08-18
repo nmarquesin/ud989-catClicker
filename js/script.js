@@ -1,12 +1,5 @@
-let elem = document.getElementById('cat');
-let menu = document.getElementById('menu');
-let prevCat;
-const counterText1 = 'You have clicked ';
-const counterText2 = ' time';
-
-
-//this is the MODEL
-const cats = [{
+// this is the MODEL
+const model = [{
 	name: 'Bob',
 	pic: 'img/cat.png',
 	counter: 0
@@ -26,57 +19,84 @@ const cats = [{
 	pic: 'img/cat4.jpeg',
 	counter: 0
 	}, {
-	name: 'Mary & John',
+	name: 'Mary',
 	pic: 'img/cat5.jpeg',
 	counter: 0
 	}];
 
-// const octopus = {};
+// this is the octopus
+const octopus = {
+ 	// this function loads the initial screen
+ 	init: function () {
+ 		view.init();
+ 		for (let cat = 0; cat < model.length; cat++) {
+			view.menu(model[cat].name);
+			document.getElementById(model[cat].name).addEventListener('click', function() {
+				octopus.clickOnCatName(model[cat]);
+			});
+		}
+		document.getElementById('picture').addEventListener('click', function() {
+			octopus.clickOnCatImg();
+		});
+ 	},
+ 	
+ 	// this function handlesclicks on names
+	clickOnCatName: function(catObj) {
+		octopus.addCount(catObj);
+		view.render(catObj.pic, catObj.counter, catObj.name);
+	},
+	
+	// this function handles clicks on cat pics
+	clickOnCatImg: function() {
+		//do something
+		let text = document.getElementById('picture').innerHTML;
+		let split1 = text.split("alt=");
+		let split2 = split1[1].split('"');
+		let catName = split2[1];
+		for (let cat = 0; cat < model.length; cat++){
+			if (catName === model[cat].name) {
+				octopus.clickOnCatName(model[cat]);} 
+		};
+	},
+ 	
+ 	// this function increments the counter
+ 	addCount: function (cat) {
+ 		cat.counter += 1;
+ 	},
+};
 
-// const view = {};
-
-function putCatsOnScreen() {
-	// this function adds cats to page and hides them.
-
-	let catList = document.createElement('ul');
-	catList.className = 'catMenu';
-	menu.appendChild(catList);
-	for (let cat = 0; cat < cats.length; cat++) {
-		let oneCat = document.createElement('div');
-		oneCat.innerHTML = '<p>'+cats[cat].name+'</p>'+'<img src="'+cats[cat].pic+'" alt="A cat" />';
-		oneCat.id = cats[cat].name;
-		elem.appendChild(oneCat);
-		let catCounter = document.createElement('p');
-
-		oneCat.appendChild(catCounter);
-		oneCat.classList.toggle('hidden');
-		let catItem = document.createElement('li');
-		catItem.innerHTML = '<li>'+cats[cat].name+'</li>';
-		catItem.addEventListener('click', function() {clickOnCatImg(cats[cat], oneCat, catCounter);});
-		catList.appendChild(catItem);
+// this is the view
+const view = {
+	//this loads the page parts to screen
+	init: function() {
+		let menu = document.createElement('ul');
+		menu.id = 'catMenu';
+		let pic = document.createElement('div');
+		pic.id = 'catPic';
+		let counter = document.createElement('div');
+		counter.id = 'counter';
+		let photo = document.createElement('figure');
+		photo.id = 'picture';
+		document.body.appendChild(menu);
+		document.body.appendChild(pic);
+		document.getElementById('catPic').appendChild(counter);
+		document.getElementById('catPic').appendChild(photo);
+	},
+	
+	// this function takes a string and puts it in the menu
+	menu: function(name) {
+		let item = document.createElement('li');
+		item.innerHTML = name;
+		item.id = name.toString();
+		document.getElementById('catMenu').appendChild(item);
+	},
+	
+	// this function renders the image area
+	render: function(picPath, clicks, name) {
+		document.getElementById('picture').innerHTML = '<img src="'+ picPath +'" alt="' + name + '" />';
+		document.getElementById('counter').innerText = name + ' has been clicked ' + clicks + (clicks > 1 ? ' times.' : ' time.');
 	}
+};
 
 
-}
-
-function clickOnCatImg(catObj, catNode, counterNode) {
-	// this function handles what should happen when a cat is clicked.
-	if (prevCat) {prevCat.classList.toggle('hidden');}
-	catObj.counter += 1;
-	let catCounter = document.createElement('p');
-
-	//let counterElem = document.getElementById('counter');
-	let plural;
-	if (catObj.counter === 1) {plural = counterText2;}
-	else {plural = counterText2 + 's';}
-	counterNode.innerHTML = '';
-	counterNode.innerHTML = '<p>'+counterText1+catObj.name+' '+catObj.counter+plural+'</p>';
-	catNode.classList.toggle('hidden');
-	prevCat = catNode;
-}
-
-
-window.addEventListener('load', function () {
-	putCatsOnScreen();
-	model.init();
-}, false);
+octopus.init();
